@@ -15,6 +15,7 @@ import os
 import numpy as np
 import models.dcgan as dcgan
 import models.mlp as mlp
+import image_slicer
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', required=True, help='cifar10 | lsun | imagenet | folder | lfw ')
@@ -108,7 +109,7 @@ else:
 if opt.netG != '': # load checkpoint if needed
     netG.load_state_dict(torch.load(opt.netG))
 
-netG.load_state_dict(torch.load("/home/miao/Documents/courses/cv/gan/FisherGAN/samples/netG_epoch_19.pth"))
+netG.load_state_dict(torch.load("/home/hoosierai/Documents/github/DeliFGAN/samples/netG_epoch_198.pth"))
 print(netG)
 
 if opt.mlp_D:
@@ -144,8 +145,8 @@ Lambda = Variable(Lambda, requires_grad=True)
 mu = Variable(torch.from_numpy(mu).float(), requires_grad=True) #changed
 sigma = Variable(torch.from_numpy(sigma).float(),requires_grad=True) #changed
 lambdaG = 1e-5
-mu.data = torch.load('/home/miao/Documents/courses/cv/gan/FisherGAN/samples/mu_epoch_19.pth')
-sigma.data = torch.load('/home/miao/Documents/courses/cv/gan/FisherGAN/samples/sigma_epoch_19.pth')
+mu.data = torch.load('/home/hoosierai/Documents/github/DeliFGAN/samples/mu_epoch_198.pth')
+sigma.data = torch.load('/home/hoosierai/Documents/github/DeliFGAN/samples/sigma_epoch_198.pth')
 print("SIGMA MEAN : " +str(sigma.data.mean()))
 print("SIGMA VARIANCE : " +str(sigma.data.var()))
 # setup optimizer
@@ -179,5 +180,5 @@ for epoch in range(10000):
 	fake.data = fake.data.mul(0.5).add(0.5)
 #	images.append(fake.data)	
 	vutils.save_image(fake.data, '{0}/fake_samples_{1}.png'.format(opt.experiment, gen_iterations))
-
-    
+	tiles = image_slicer.slice('{0}/fake_samples_{1}.png'.format(opt.experiment, gen_iterations), 64, save=False)
+	image_slicer.save_tiles(tiles, directory='/home/hoosierai/Documents/github/DeliFGAN/samples/sliced',prefix='fake_samples_{0}.png'.format(gen_iterations))
