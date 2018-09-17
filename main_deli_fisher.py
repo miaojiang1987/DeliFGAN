@@ -15,6 +15,9 @@ import os
 import numpy as np
 import models.dcgan as dcgan
 import models.mlp as mlp
+from time import sleep
+import image_slicer
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', required=True, help='cifar10 | lsun | imagenet | folder | lfw ')
@@ -130,9 +133,9 @@ if opt.netD != '':
 print(netD)
 
 mu = np.random.uniform(-1,1,(opt.batchSize,nz,1,1))
-mu.fill(0) 
+mu.fill(0.2) 
 sigma = np.random.uniform(1,2,(opt.batchSize,nz,1,1))
-#sigma.fill(5)
+sigma.fill(8.5)
 input = torch.FloatTensor(opt.batchSize, 3, opt.imageSize, opt.imageSize)
 #noise = torch.FloatTensor(opt.batchSize, nz, 1, 1)
 fixed_noise = torch.FloatTensor(opt.batchSize, nz, 1, 1).normal_(0, 1)
@@ -265,7 +268,11 @@ for epoch in range(opt.niter):
             vutils.save_image(real_cpu, '{0}/real_samples.png'.format(opt.experiment))
             fake = netG(Variable(fixed_noise, volatile=True))
             fake.data = fake.data.mul(0.5).add(0.5)
-            vutils.save_image(fake.data, '{0}/fake_samples_{1}.png'.format(opt.experiment, gen_iterations))
+#            vutils.save_image(fake.data, '{0}/fake_samples_{1}.png'.format(opt.experiment, gen_iterations))
+#            tiles = image_slicer.slice('{0}/fake_samples_{1}.png'.format(opt.experiment, gen_iterations), 64, save=False)		
+#            image_slicer.save_tiles(tiles, directory='/home/hoosierai/Documents/github/DeliFGAN/samples/sliced',prefix='fake_samples_{0}.png'.format(gen_iterations))
+            
+            
 
     # do checkpointing
     torch.save(mu.data, '{0}/mu_epoch_{1}.pth'.format(opt.experiment, epoch))
